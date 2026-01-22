@@ -21,6 +21,8 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
     		GROUP BY t.name
     		""")
     		List<Object[]> countQuestionsByTopic();
+    		
+
 
 
 }
