@@ -1,136 +1,114 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Test Review | SkillScore</title>
+    <title>Test Result | SkillScore</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        body {
-            background: #f5f7fa;
-            font-family: Arial, sans-serif;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+
+        body { background: #AEDEFC; }
+
+        .navbar {
+            height: 64px;
+            background: #0f172a;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
         }
+
+        .navbar a { color: #fff; text-decoration: none; font-weight: 600; }
 
         .container {
-            width: 60%;
+            max-width: 900px;
             margin: 30px auto;
             background: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.08);
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 26px rgba(0,0,0,0.12);
         }
 
         .summary-box {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            background: #eef3ff;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .q-card {
-            background: #fdfdfd;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            border-left: 5px solid #ccc;
-        }
-
-        .correct {
-            border-left: 5px solid #22c55e;
-            background: #dcfce7;
-        }
-
-        .wrong {
-            border-left: 5px solid #ef4444;
-            background: #fee2e2;
-        }
-
-        .question {
-            font-weight: bold;
-        }
-
-        .correct-ans {
-            color: #22c55e;
-            font-weight: bold;
-        }
-
-        .wrong-ans {
-            color: #ef4444;
-            font-weight: bold;
-        }
-
-        .btn {
-            display: block;
-            width: 200px;
-            margin: 25px auto 0;
-            padding: 12px;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.10);
             text-align: center;
-            background: #3b82f6;
-            color: #fff;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 16px;
         }
 
-        .btn:hover {
-            background: #2563eb;
+        .score { font-size: 35px; font-weight: 700; color: #2563eb; }
+
+        .result-list {
+            margin-top: 25px;
         }
+
+        .question-card {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .correct { color: #16a34a; font-weight: 600; }
+        .wrong { color: #dc2626; font-weight: 600; }
+
+        .answer-box {
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-top: 6px;
+        }
+
+        .user-correct { background: #dcfce7; }
+        .user-wrong { background: #fee2e2; }
+
     </style>
 </head>
+
 <body>
+
+<header class="navbar">
+    <div>SkillScore</div>
+    <a href="/aptitude">← Back</a>
+</header>
 
 <div class="container">
 
-    <h2>📝 Test Review</h2>
-
     <div class="summary-box">
-        <div><b>Score:</b> ${score}</div>
-        <div><b>Total Questions:</b> ${answers.size()}</div>
-        <div>
-            <b>Percentage:</b>
-            <c:set var="percent" value="${(score * 100) / answers.size()}"/>
-            ${percent}%
-        </div>
+        <h2>Your Test Result</h2>
+        <p class="score">${score}/${totalQuestions}</p>
+
+        <p><b>Correct:</b> <span class="correct">${correctCount}</span></p>
+        <p><b>Wrong:</b> <span class="wrong">${wrongCount}</span></p>
     </div>
 
-    <!-- Loop through all answered questions -->
-    <c:forEach var="entry" items="${answers}">
-        <c:set var="qId" value="${entry.key}"/>
-        <c:set var="userAns" value="${entry.value}"/>
+    <h2>Question Review</h2>
 
-        <!-- Fetch full Question object -->
-        <c:set var="q" value="${questionRepository.findById(qId).get()}"/>
+    <div class="result-list">
+        <c:forEach var="r" items="${results}">
+            <div class="question-card">
+                <h3>${r.question}</h3>
 
-        <div class="q-card 
-            <c:if test='${userAns == q.correctOption}'>correct</c:if>
-            <c:if test='${userAns != q.correctOption}'>wrong</c:if>
-        ">
-            <div class="question">Q. ${qId}: ${q.text}</div>
-            <br>
+                <div class="answer-box 
+                    ${r.userCorrect ? 'user-correct' : 'user-wrong'}">
 
-            <div>
-                Your Answer: 
-                <span class="${userAns == q.correctOption ? 'correct-ans' : 'wrong-ans'}">
-                    ${userAns}
-                </span>
+                    <p><b>Your Answer:</b> ${r.userAnswer}</p>
+                    <p><b>Correct Answer:</b> ${r.correctAnswer}</p>
+
+                    <p class="${r.userCorrect ? 'correct' : 'wrong'}">
+                        ${r.userCorrect ? '✔ Correct' : '✖ Wrong'}
+                    </p>
+                </div>
+
             </div>
-
-            <div>
-                Correct Answer:
-                <span class="correct-ans">${q.correctOption}</span>
-            </div>
-        </div>
-
-    </c:forEach>
-
-    <a href="/user/dashboard" class="btn">⬅ Back to Dashboard</a>
+        </c:forEach>
+    </div>
 
 </div>
 

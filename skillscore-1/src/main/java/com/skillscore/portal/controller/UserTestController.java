@@ -41,8 +41,9 @@ public class UserTestController {
         model.addAttribute("subtopic", subtopic);
         model.addAttribute("questions", questions);
 
-        return "user/test";   // test.jsp
+        return "user/test";  // LOADS SAME UI FOR EVERY SUBTOPIC
     }
+
 
     // -----------------------------------------
     // 2️⃣ Auto-Save Answer (AJAX)

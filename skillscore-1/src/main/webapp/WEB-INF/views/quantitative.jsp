@@ -19,7 +19,6 @@
             color: #0f172a;
         }
 
-        /* NAVBAR */
         .navbar {
             height: 64px;
             background: #0f172a;
@@ -36,7 +35,6 @@
             font-weight: 600;
         }
 
-        /* CONTAINER */
         .container {
             max-width: 1100px;
             margin: 30px auto;
@@ -52,7 +50,6 @@
             margin-bottom: 24px;
         }
 
-        /* TOPIC GRID */
         .topic-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -82,7 +79,6 @@
             margin-bottom: 12px;
         }
 
-        /* PROGRESS BAR */
         .progress-bar {
             background: #e5e7eb;
             border-radius: 20px;
@@ -114,14 +110,13 @@
 
 <body>
 
-<!-- NAVBAR -->
 <header class="navbar">
     <div>SkillScore</div>
     <a href="/aptitude">← Back to Aptitude</a>
 </header>
 
-<!-- MAIN -->
 <div class="container">
+
     <h1>Quantitative Aptitude</h1>
     <p class="subtitle">Practice core quantitative concepts for placements</p>
 
@@ -132,17 +127,15 @@
             <p>Basics, increase & decrease</p>
 
             <div class="progress-bar">
-                <div class="progress" style="width: 30%"></div>
+                <div class="progress" style="width: 0%"></div>
             </div>
 
-			<button onclick="startPercentages()">Start</button>
-
-			<script>
-			function startPercentages() {
-			    window.location.href = "/student/aptitude/percentages";
-			}
-			</script>
-
+            <button onclick="startPercentages()">Start</button>
+            <script>
+                function startPercentages() {
+                    window.location.href = "/user/quantitative/test";
+                }
+            </script>
         </div>
 
         <div class="topic-card">
@@ -153,14 +146,12 @@
                 <div class="progress" style="width: 0%"></div>
             </div>
 
-			<button onclick="startProfitLoss()">Start</button>
-
-			<script>
-			function startProfitLoss() {
-			    window.location.href = "/profit-loss";
-			}
-			</script>
-
+            <button onclick="startProfitLoss()">Start</button>
+            <script>
+                function startProfitLoss() {
+                    window.location.href = "/user/quantitative/profit-loss";
+                }
+            </script>
         </div>
 
         <div class="topic-card">
@@ -168,17 +159,15 @@
             <p>Pipes, work efficiency</p>
 
             <div class="progress-bar">
-                <div class="progress" style="width: 60%"></div>
+                <div class="progress" style="width: 0%"></div>
             </div>
 
-			<button onclick="startTimeWork()">Resume</button>
-
-			<script>
-			function startTimeWork() {
-			    window.location.href = "/time-work";
-			}
-			</script>
-
+            <button onclick="startTimeWork()">Start</button>
+            <script>
+                function startTimeWork() {
+                    window.location.href = "/user/quantitative/time-work";
+                }
+            </script>
         </div>
 
         <div class="topic-card">
@@ -189,14 +178,12 @@
                 <div class="progress" style="width: 0%"></div>
             </div>
 
-			<button onclick="startTSD()">Start</button>
-
-			<script>
-			function startTSD() {
-			    window.location.href = "/time-speed-distance";
-			}
-			</script>
-
+            <button onclick="startTSD()">Start</button>
+            <script>
+                function startTSD() {
+                    window.location.href = "/user/quantitative/tsd";
+                }
+            </script>
         </div>
 
     </div>
