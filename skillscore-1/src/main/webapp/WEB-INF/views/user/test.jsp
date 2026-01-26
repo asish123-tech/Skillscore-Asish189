@@ -41,13 +41,15 @@
             box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
         }
 
-        .option-box {
-            padding: 15px;
-            margin: 12px 0;
-            border: 2px solid #dfe7f1;
-            border-radius: 12px;
-            cursor: pointer;
-        }
+		.option-box {
+		    padding: 15px;
+		    margin: 0 10px 10px 0;   /* <-- add this */
+		    border: 2px solid #dfe7f1;
+		    border-radius: 12px;
+		    cursor: pointer;
+		    display: inline-block;  /* ensures spacing works */
+		}
+
         .option-box:hover {
             background: #eef5ff;
         }

@@ -25,6 +25,9 @@ public class UserTestController {
 
     private Map<Long, Long> selectedAnswers = new HashMap<>();
 
+    // 🟢 NEW — Track Start Time
+    private long startTime = 0;
+
 
     // ---------- LOAD TEST PAGE ----------
     @GetMapping("/test")
@@ -32,6 +35,11 @@ public class UserTestController {
             @RequestParam Long subtopicId,
             @RequestParam(defaultValue = "0") int index,
             Model model) {
+
+        // Start time set ONLY when test first loads
+        if (index == 0) {
+            startTime = System.currentTimeMillis();
+        }
 
         Subtopic subtopic = subtopicRepository.findById(subtopicId).orElse(null);
         List<Question> questions = questionRepository.findBySubtopic(subtopic);
@@ -79,11 +87,18 @@ public class UserTestController {
             }
         }
 
+        // 🟢 NEW — Calculate Time Taken
+        long endTime = System.currentTimeMillis();
+        long timeTaken = (endTime - startTime) / 1000; // seconds
+
         model.addAttribute("score", score);
         model.addAttribute("total", questions.size());
         model.addAttribute("selected", selectedAnswers);
 
-        return "review";
+        // 🟢 NEW — Pass time taken to review page
+        model.addAttribute("timeTaken", timeTaken);
+
+        return "user/review";
     }
 
 
@@ -94,4 +109,5 @@ public class UserTestController {
                            @RequestParam Long optionId) {
         selectedAnswers.put(questionId, optionId);
     }
+
 }

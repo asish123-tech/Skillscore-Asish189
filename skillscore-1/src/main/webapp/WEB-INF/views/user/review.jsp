@@ -1,116 +1,242 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
+
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Result | SkillScore</title>
+    <title>Review Summary</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-
-        body { background: #AEDEFC; }
-
-        .navbar {
-            height: 64px;
-            background: #0f172a;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 32px;
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6fb;
+            margin: 0;
+            padding: 0;
         }
-
-        .navbar a { color: #fff; text-decoration: none; font-weight: 600; }
 
         .container {
-            max-width: 900px;
-            margin: 30px auto;
+            width: 60%;
+            margin: 40px auto;
             background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+            padding: 40px;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
         }
 
-        .summary-box {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 14px;
-            margin-bottom: 24px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.10);
+        h2 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .circle-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        /* Circular progress */
+        .progress {
+            width: 160px;
+            height: 160px;
+            background: conic-gradient(#4CAF50 calc(var(--p) * 1%), #ddd 0%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .progress-value {
+            font-size: 32px;
+            font-weight: 600;
+            position: absolute;
+        }
+
+        /* Score badge */
+        .badge {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .gold { color: #DAA520; }
+        .silver { color: #9E9E9E; }
+        .bronze { color: #CD7F32; }
+        .fail { color: #E53935; }
+
+        /* Time card */
+        .time-card {
+            margin: 25px auto;
+            width: 50%;
+            background: #eef3ff;
+            border-left: 5px solid #3f51b5;
+            padding: 18px;
+            border-radius: 8px;
+            font-size: 18px;
             text-align: center;
         }
 
-        .score { font-size: 35px; font-weight: 700; color: #2563eb; }
-
-        .result-list {
-            margin-top: 25px;
+        /* Results Table */
+        table {
+            width: 100%;
+            margin-top: 40px;
+            border-collapse: collapse;
         }
 
-        .question-card {
-            background: #f8fafc;
-            padding: 20px;
-            border-radius: 14px;
-            margin-bottom: 20px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        th, td {
+            padding: 14px;
+            border-bottom: 1px solid #ddd;
         }
 
-        .correct { color: #16a34a; font-weight: 600; }
-        .wrong { color: #dc2626; font-weight: 600; }
-
-        .answer-box {
-            padding: 8px 12px;
-            border-radius: 8px;
-            margin-top: 6px;
+        th {
+            background: #3f51b5;
+            color: #fff;
+            text-align: left;
         }
 
-        .user-correct { background: #dcfce7; }
-        .user-wrong { background: #fee2e2; }
+        .tick { color: green; font-size: 22px; }
+        .cross { color: red; font-size: 22px; }
 
+        /* Confetti */
+        #confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
     </style>
 </head>
 
 <body>
 
-<header class="navbar">
-    <div>SkillScore</div>
-    <a href="/aptitude">← Back</a>
-</header>
+<canvas id="confetti"></canvas>
 
 <div class="container">
 
-    <div class="summary-box">
-        <h2>Your Test Result</h2>
-        <p class="score">${score}/${totalQuestions}</p>
+    <h2>Test Review</h2>
 
-        <p><b>Correct:</b> <span class="correct">${correctCount}</span></p>
-        <p><b>Wrong:</b> <span class="wrong">${wrongCount}</span></p>
+    <%
+        int score = (int) request.getAttribute("score");
+        long timeTaken = (long) request.getAttribute("timeTaken"); // milliseconds
+        Map<Long,String> answers = (Map<Long,String>) request.getAttribute("answers");
+
+        int total = answers.size();
+        double percent = ((double) score / total) * 100;
+
+        long seconds = timeTaken / 1000;
+        long minutes = seconds / 60;
+        seconds %= 60;
+
+        String rank = "";
+        String badgeClass = "";
+
+        if (percent >= 90) { rank = "Gold Performer 🥇"; badgeClass = "gold"; }
+        else if (percent >= 70) { rank = "Silver Performer 🥈"; badgeClass = "silver"; }
+        else if (percent >= 50) { rank = "Bronze Performer 🥉"; badgeClass = "bronze"; }
+        else { rank = "Needs Improvement 🔴"; badgeClass = "fail"; }
+    %>
+
+    <!-- Circular Graph -->
+    <div class="circle-wrapper">
+        <div class="progress" style="--p:<%= percent %>;">
+            <div class="progress-value" id="scoreCounter">0%</div>
+        </div>
     </div>
 
-    <h2>Question Review</h2>
-
-    <div class="result-list">
-        <c:forEach var="r" items="${results}">
-            <div class="question-card">
-                <h3>${r.question}</h3>
-
-                <div class="answer-box 
-                    ${r.userCorrect ? 'user-correct' : 'user-wrong'}">
-
-                    <p><b>Your Answer:</b> ${r.userAnswer}</p>
-                    <p><b>Correct Answer:</b> ${r.correctAnswer}</p>
-
-                    <p class="${r.userCorrect ? 'correct' : 'wrong'}">
-                        ${r.userCorrect ? '✔ Correct' : '✖ Wrong'}
-                    </p>
-                </div>
-
-            </div>
-        </c:forEach>
+    <!-- Rank Badge -->
+    <div class="badge <%= badgeClass %>">
+        <%= rank %>
     </div>
+
+    <!-- Time Taken -->
+    <div class="time-card">
+        ⏱ Time Taken: <b><%= minutes %> min <%= seconds %> sec</b>
+    </div>
+
+    <!-- Table -->
+    <table>
+        <tr>
+            <th>Q. No</th>
+            <th>Your Answer</th>
+            <th>Status</th>
+        </tr>
+
+        <%
+            int i = 1;
+            for (Map.Entry<Long,String> e : answers.entrySet()) {
+                String userAns = e.getValue();
+        %>
+            <tr>
+                <td><%= i++ %></td>
+                <td><%= userAns %></td>
+                <td>
+                    <% if (userAns != null) { %>
+                        ✔ <span class="tick"></span>
+                    <% } else { %>
+                        ✘ <span class="cross"></span>
+                    <% } %>
+                </td>
+            </tr>
+        <% } %>
+    </table>
 
 </div>
+
+
+<script>
+    /* Animated score counter */
+    let counter = document.getElementById("scoreCounter");
+    let target = <%= (int) percent %>;
+    let x = 0;
+
+    let interval = setInterval(() => {
+        counter.innerHTML = x + "%";
+        x++;
+        if (x > target) clearInterval(interval);
+    }, 20);
+
+    /* Confetti effect for > 80% */
+    if (target >= 80) {
+        startConfetti();
+    }
+
+    /* Simple Confetti Canvas */
+    function startConfetti() {
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const pieces = [];
+        for (let i = 0; i < 150; i++) {
+            pieces.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                size: 8,
+                speed: Math.random() * 3 + 2
+            });
+        }
+
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            pieces.forEach(p => {
+                ctx.fillStyle = "hsl(" + Math.random()*360 + ",100%,50%)";
+                ctx.fillRect(p.x, p.y += p.speed, p.size, p.size);
+                if (p.y > canvas.height) p.y = -20;
+            });
+            requestAnimationFrame(draw);
+        }
+        draw();
+    }
+</script>
 
 </body>
 </html>
