@@ -43,11 +43,11 @@
 
 		.option-box {
 		    padding: 15px;
-		    margin: 0 10px 10px 0;   /* <-- add this */
+		    margin: 0 10px 10px 0;  
 		    border: 2px solid #dfe7f1;
 		    border-radius: 12px;
 		    cursor: pointer;
-		    display: inline-block;  /* ensures spacing works */
+		    display: inline-block;  
 		}
 
         .option-box:hover {
