@@ -34,7 +34,7 @@
 
         .container {
             max-width: 900px;
-            margin: 120px auto 40px auto;  /* pushed down because navbar */
+            margin: 120px auto 40px auto;  
             background: white;
             border-radius: 20px;
             padding: 40px;
