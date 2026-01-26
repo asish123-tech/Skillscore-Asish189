@@ -3,23 +3,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>${subtopic.name} | SkillScore</title>
+    <title>Test | SkillScore</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
 
-        body {
-            background: #AEDEFC;
-        }
+        body { background: #AEDEFC; color: #0f172a; }
 
-        /* NAVBAR */
         .navbar {
             height: 64px;
             background: #0f172a;
@@ -31,136 +23,130 @@
         }
 
         .navbar a {
-            color: #fff;
             text-decoration: none;
+            color: #fff;
             font-weight: 600;
         }
 
-        /* MAIN CONTAINER */
         .container {
-            max-width: 900px;
-            margin: 30px auto;
+            max-width: 850px;
+            margin: 25px auto;
             background: #fff;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 8px 26px rgba(0,0,0,0.12);
-        }
-
-        h1 {
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: #475569;
-            margin-bottom: 24px;
+            padding: 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.12);
         }
 
         .question-box {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: #f8fafc;
-            border-radius: 12px;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
         }
 
-        .option {
-            margin: 6px 0;
-        }
-
-        .submit-btn {
-            width: 100%;
-            margin-top: 20px;
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 14px;
-            font-size: 16px;
+        .options label {
+            display: block;
+            background: #f1f5f9;
+            padding: 12px;
             border-radius: 10px;
+            margin-bottom: 10px;
             cursor: pointer;
         }
 
-        .submit-btn:hover {
-            background: #1e40af;
+        .nav-buttons {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
         }
-    </style>
 
+        button {
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        button:hover { background: #1d4ed8; }
+
+    </style>
 </head>
+
 <body>
 
-<!-- NAVBAR -->
 <header class="navbar">
     <div>SkillScore</div>
     <a href="/aptitude">← Back</a>
 </header>
 
-<!-- MAIN CONTENT -->
 <div class="container">
 
-    <h1>${subtopic.name}</h1>
-    <p class="subtitle">Answer the following questions</p>
+    <h2>${subtopic.name}</h2>
 
-    <form id="testForm">
+    <c:if test="${not empty questions}">
+        <div class="question-box">
+            <h3>Q${currentIndex + 1}. ${questions[currentIndex].questionText}</h3>
 
-        <c:forEach var="q" items="${questions}" varStatus="loop">
-            <div class="question-box">
-                <h3>Q${loop.index + 1}. ${q.questionText}</h3>
+            <div class="options">
+                <label>
+                    <input type="radio" name="answer" value="${questions[currentIndex].optionA}"
+                           ${savedAnswer == questions[currentIndex].optionA ? 'checked' : ''} />
+                    ${questions[currentIndex].optionA}
+                </label>
 
-                <div class="option">
-                    <input type="radio" name="q${q.id}" value="${q.optionA}" onchange="saveAnswer(${q.id}, '${q.optionA}')">
-                    ${q.optionA}
-                </div>
+                <label>
+                    <input type="radio" name="answer" value="${questions[currentIndex].optionB}"
+                           ${savedAnswer == questions[currentIndex].optionB ? 'checked' : ''} />
+                    ${questions[currentIndex].optionB}
+                </label>
 
-                <div class="option">
-                    <input type="radio" name="q${q.id}" value="${q.optionB}" onchange="saveAnswer(${q.id}, '${q.optionB}')">
-                    ${q.optionB}
-                </div>
+                <label>
+                    <input type="radio" name="answer" value="${questions[currentIndex].optionC}"
+                           ${savedAnswer == questions[currentIndex].optionC ? 'checked' : ''} />
+                    ${questions[currentIndex].optionC}
+                </label>
 
-                <div class="option">
-                    <input type="radio" name="q${q.id}" value="${q.optionC}" onchange="saveAnswer(${q.id}, '${q.optionC}')">
-                    ${q.optionC}
-                </div>
-
-                <div class="option">
-                    <input type="radio" name="q${q.id}" value="${q.optionD}" onchange="saveAnswer(${q.id}, '${q.optionD}')">
-                    ${q.optionD}
-                </div>
+                <label>
+                    <input type="radio" name="answer" value="${questions[currentIndex].optionD}"
+                           ${savedAnswer == questions[currentIndex].optionD ? 'checked' : ''} />
+                    ${questions[currentIndex].optionD}
+                </label>
             </div>
-        </c:forEach>
+        </div>
+    </c:if>
 
-        <button type="button" class="submit-btn" onclick="submitTest()">Submit Test</button>
-
-    </form>
+    <div class="nav-buttons">
+        <button onclick="navigate('prev')" ${currentIndex == 0 ? 'disabled' : ''}>Previous</button>
+        <button onclick="navigate('next')" ${currentIndex == questionsSize - 1 ? 'disabled' : ''}>Next</button>
+        <button onclick="submitTest()">Submit Test</button>
+    </div>
 
 </div>
 
 <script>
-    // Auto save (calls your controller "/user/test/saveAnswer")
-    function saveAnswer(questionId, answer) {
-        fetch('/user/test/saveAnswer', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ questionId: questionId, answer: answer })
-        });
+    function navigate(direction) {
+        const selected = document.querySelector('input[name="answer"]:checked');
+        const ans = selected ? selected.value : "";
+
+        const payload = {
+            questionId: "${questions[currentIndex].id}",
+            answer: ans,
+            direction: direction
+        };
+
+        fetch("/user/test/saveAnswerAndNavigate", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(payload)
+        })
+        .then(resp => window.location.reload());
     }
 
-    // Submit full test
     function submitTest() {
-        let formData = {};
-
-        const inputs = document.querySelectorAll("input[type=radio]:checked");
-        inputs.forEach(i => {
-            formData[i.name.replace('q', '')] = i.value;
-        });
-
-        fetch('/user/test/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(formData)
-        })
-        .then(res => res.json())
-        .then(data => {
-            window.location.href = "/user/test/review?score=" + data.score;
-        });
+        fetch("/user/test/submitFinal", { method: "POST" })
+            .then(resp => resp.json())
+            .then(data => {
+                window.location.href = "/user/test/review?score=" + data.score;
+            });
     }
 </script>
 
