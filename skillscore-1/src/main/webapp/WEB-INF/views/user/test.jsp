@@ -11,15 +11,36 @@
         body {
             background: #c9eaff;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
+
+        /* NAVBAR */
+		.navbar {
+		            height: 64px;
+		            background: #0f172a;
+		            color: #fff;
+		            display: flex;
+		            align-items: center;
+		            justify-content: space-between;
+		            padding: 0 32px;
+		        }
+
+		        .navbar a {
+		            color: #fff;
+		            text-decoration: none;
+		            font-weight: 600;
+		        }
+
         .container {
             max-width: 900px;
-            margin: 40px auto;
+            margin: 120px auto 40px auto;  /* pushed down because navbar */
             background: white;
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
         }
+
         .option-box {
             padding: 15px;
             margin: 12px 0;
@@ -56,6 +77,12 @@
 
 </head>
 <body>
+
+<!-- NAVBAR -->
+<header class="navbar">
+    <div>SkillScore</div>
+    <a href="/quantitative">← Back to Quantitative</a>
+</header>
 
 <div class="container">
 
