@@ -7,97 +7,91 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.skillscore.portal.entity.Option;
 import com.skillscore.portal.entity.Question;
 import com.skillscore.portal.entity.Subtopic;
 import com.skillscore.portal.repository.QuestionRepository;
 import com.skillscore.portal.repository.SubtopicRepository;
 
 @Controller
-@RequestMapping("/user/test")
+@RequestMapping("/user/quantitative")
 public class UserTestController {
-
-    @Autowired
-    private QuestionRepository questionRepository;
 
     @Autowired
     private SubtopicRepository subtopicRepository;
 
-    // Temporary memory to store answers (later store in DB)
-    private Map<Long, String> userAnswers = new HashMap<>();
+    @Autowired
+    private QuestionRepository questionRepository;
 
-    // ---------------------------------------------------------
-    // 1️⃣ LOAD TEST PAGE PER SUBTOPIC
-    // ---------------------------------------------------------
-    @GetMapping("/start")
-    public String startTest(@RequestParam("subtopicId") Long subtopicId, Model model) {
+    private Map<Long, Long> selectedAnswers = new HashMap<>();
 
-        Subtopic subtopic = subtopicRepository.findById(subtopicId)
-                .orElseThrow(() -> new RuntimeException("Subtopic not found"));
 
+    // ---------- LOAD TEST PAGE ----------
+    @GetMapping("/test")
+    public String loadTest(
+            @RequestParam Long subtopicId,
+            @RequestParam(defaultValue = "0") int index,
+            Model model) {
+
+        Subtopic subtopic = subtopicRepository.findById(subtopicId).orElse(null);
         List<Question> questions = questionRepository.findBySubtopic(subtopic);
 
-        model.addAttribute("subtopic", subtopic);
+        if (questions == null || questions.isEmpty()) {
+            model.addAttribute("error", "No Questions Found");
+            return "user/test";
+        }
+
+        if (index < 0) index = 0;
+        if (index >= questions.size()) index = questions.size() - 1;
+
+        Question currentQuestion = questions.get(index);
+
+        model.addAttribute("subtopicName", subtopic.getName());
+        model.addAttribute("subtopicId", subtopicId);
+        model.addAttribute("question", currentQuestion);
         model.addAttribute("questions", questions);
+        model.addAttribute("currentIndex", index);
+        model.addAttribute("totalQuestions", questions.size());
 
-        return "user/test";   // test.jsp
+        return "user/test";
     }
 
-    // ---------------------------------------------------------
-    // 2️⃣ AUTO-SAVE ANSWER (AJAX)
-    // ---------------------------------------------------------
-    @PostMapping("/saveAnswer")
-    @ResponseBody
-    public String saveAnswer(@RequestBody Map<String, Object> payload) {
 
-        Long questionId = Long.valueOf(payload.get("questionId").toString());
-        String answer = payload.get("answer").toString();
-
-        userAnswers.put(questionId, answer);
-
-        return "saved";
-    }
-
-    // ---------------------------------------------------------
-    // 3️⃣ SUBMIT TEST (AJAX)
-    // ---------------------------------------------------------
+    // ---------- SUBMIT TEST ----------
     @PostMapping("/submit")
-    @ResponseBody
-    public Map<String, Object> submitTest(@RequestBody Map<String, Object> payload) {
+    public String submit(
+            @RequestParam Long subtopicId,
+            Model model) {
+
+        Subtopic subtopic = subtopicRepository.findById(subtopicId).orElse(null);
+        List<Question> questions = questionRepository.findBySubtopic(subtopic);
 
         int score = 0;
-        int total = 0;
-
-        List<Question> questions = questionRepository.findAll();   // use only the subtopic ones in DB version
 
         for (Question q : questions) {
-            total++;
+            Long markedOption = selectedAnswers.get(q.getId());
+            if (markedOption == null) continue;
 
-            String userSelected = (String) payload.get(q.getId().toString());
-            String rightAnswer = q.getCorrectAnswerText();
-
-            if (userSelected != null && userSelected.equals(rightAnswer)) {
-                score++;
+            for (Option opt : q.getOptions()) {
+                if (opt.isCorrect() && opt.getId().equals(markedOption)) {
+                    score++;
+                }
             }
         }
 
-        return Map.of(
-                "score", score,
-                "total", total
-        );
+        model.addAttribute("score", score);
+        model.addAttribute("total", questions.size());
+        model.addAttribute("selected", selectedAnswers);
+
+        return "review";
     }
 
-    // ---------------------------------------------------------
-    // 4️⃣ REVIEW PAGE
-    // ---------------------------------------------------------
-    @GetMapping("/review")
-    public String review(@RequestParam("score") int score,
-                         @RequestParam("total") int total,
-                         Model model) {
 
-        model.addAttribute("score", score);
-        model.addAttribute("total", total);
-        model.addAttribute("answers", userAnswers);
-
-        return "user/review"; // review.jsp
+    // ---------- SAVE SELECTED OPTION ----------
+    @PostMapping("/save")
+    @ResponseBody
+    public void saveAnswer(@RequestParam Long questionId,
+                           @RequestParam Long optionId) {
+        selectedAnswers.put(questionId, optionId);
     }
 }

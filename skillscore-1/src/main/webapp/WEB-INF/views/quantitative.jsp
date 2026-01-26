@@ -133,7 +133,8 @@
             <button onclick="startPercentages()">Start</button>
             <script>
                 function startPercentages() {
-                    window.location.href = "/user/quantitative/test";
+					window.location.href = "/user/quantitative/test?subtopicId=21";
+
                 }
             </script>
         </div>
@@ -149,7 +150,8 @@
             <button onclick="startProfitLoss()">Start</button>
             <script>
                 function startProfitLoss() {
-                    window.location.href = "/user/quantitative/profit-loss";
+					window.location.href = "/user/quantitative/test?subtopicId=22";
+
                 }
             </script>
         </div>
@@ -165,7 +167,8 @@
             <button onclick="startTimeWork()">Start</button>
             <script>
                 function startTimeWork() {
-                    window.location.href = "/user/quantitative/time-work";
+					window.location.href = "/user/quantitative/test?subtopicId=23";
+
                 }
             </script>
         </div>
@@ -181,7 +184,8 @@
             <button onclick="startTSD()">Start</button>
             <script>
                 function startTSD() {
-                    window.location.href = "/user/quantitative/tsd";
+					window.location.href = "/user/quantitative/test?subtopicId=24";
+
                 }
             </script>
         </div>
