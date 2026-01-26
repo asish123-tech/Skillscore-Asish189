@@ -1,8 +1,6 @@
 package com.skillscore.portal.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,12 +22,12 @@ public class UserTestController {
     @Autowired
     private SubtopicRepository subtopicRepository;
 
-    // Temporary in-memory storage for answers (you can convert to DB later)
+    // Temporary memory to store answers (later store in DB)
     private Map<Long, String> userAnswers = new HashMap<>();
 
-    // -----------------------------------------
-    // 1️⃣ Start Test
-    // -----------------------------------------
+    // ---------------------------------------------------------
+    // 1️⃣ LOAD TEST PAGE PER SUBTOPIC
+    // ---------------------------------------------------------
     @GetMapping("/start")
     public String startTest(@RequestParam("subtopicId") Long subtopicId, Model model) {
 
@@ -41,13 +39,12 @@ public class UserTestController {
         model.addAttribute("subtopic", subtopic);
         model.addAttribute("questions", questions);
 
-        return "user/test";  // LOADS SAME UI FOR EVERY SUBTOPIC
+        return "user/test";   // test.jsp
     }
 
-
-    // -----------------------------------------
-    // 2️⃣ Auto-Save Answer (AJAX)
-    // -----------------------------------------
+    // ---------------------------------------------------------
+    // 2️⃣ AUTO-SAVE ANSWER (AJAX)
+    // ---------------------------------------------------------
     @PostMapping("/saveAnswer")
     @ResponseBody
     public String saveAnswer(@RequestBody Map<String, Object> payload) {
@@ -60,35 +57,45 @@ public class UserTestController {
         return "saved";
     }
 
-    // -----------------------------------------
-    // 3️⃣ Submit Test (AJAX)
-    // -----------------------------------------
+    // ---------------------------------------------------------
+    // 3️⃣ SUBMIT TEST (AJAX)
+    // ---------------------------------------------------------
     @PostMapping("/submit")
     @ResponseBody
     public Map<String, Object> submitTest(@RequestBody Map<String, Object> payload) {
 
         int score = 0;
+        int total = 0;
 
-        List<Question> questions = questionRepository.findAll();
+        List<Question> questions = questionRepository.findAll();   // use only the subtopic ones in DB version
 
         for (Question q : questions) {
-            String userSelected = (String) payload.get(q.getId().toString());
+            total++;
 
-            if (userSelected != null && userSelected.equals(q.getCorrectAnswerText())) {
+            String userSelected = (String) payload.get(q.getId().toString());
+            String rightAnswer = q.getCorrectAnswerText();
+
+            if (userSelected != null && userSelected.equals(rightAnswer)) {
                 score++;
             }
         }
 
-        return Map.of("score", score);
+        return Map.of(
+                "score", score,
+                "total", total
+        );
     }
 
-    // -----------------------------------------
-    // 4️⃣ Review Page
-    // -----------------------------------------
+    // ---------------------------------------------------------
+    // 4️⃣ REVIEW PAGE
+    // ---------------------------------------------------------
     @GetMapping("/review")
-    public String review(@RequestParam("score") int score, Model model) {
+    public String review(@RequestParam("score") int score,
+                         @RequestParam("total") int total,
+                         Model model) {
 
         model.addAttribute("score", score);
+        model.addAttribute("total", total);
         model.addAttribute("answers", userAnswers);
 
         return "user/review"; // review.jsp
