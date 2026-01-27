@@ -23,20 +23,21 @@ public class UserTestController {
     @Autowired
     private QuestionRepository questionRepository;
 
+    // 🟢 Stores answers like:  questionId → selectedOptionId
     private Map<Long, Long> selectedAnswers = new HashMap<>();
 
-    // 🟢 NEW — Track Start Time
+    // 🟢 Track Start Time
     private long startTime = 0;
 
 
-    // ---------- LOAD TEST PAGE ----------
+    // ========== LOAD TEST PAGE ==========
     @GetMapping("/test")
     public String loadTest(
             @RequestParam Long subtopicId,
             @RequestParam(defaultValue = "0") int index,
             Model model) {
 
-        // Start time set ONLY when test first loads
+        // Set start time only once
         if (index == 0) {
             startTime = System.currentTimeMillis();
         }
@@ -61,11 +62,31 @@ public class UserTestController {
         model.addAttribute("currentIndex", index);
         model.addAttribute("totalQuestions", questions.size());
 
+        // 🟢 Send saved answers to JSP so selected option stays highlighted
+        model.addAttribute("savedAnswers", selectedAnswers);
+
         return "user/test";
     }
 
 
-    // ---------- SUBMIT TEST ----------
+    // ========== SAVE ANSWER (from test.jsp Save & Next) ==========
+    @PostMapping("/save-answer")
+    public String saveAnswer(
+            @RequestParam Long questionId,
+            @RequestParam(required = false) Long selectedOption,
+            @RequestParam Long subtopicId,
+            @RequestParam int index) {
+
+        if (selectedOption != null) {
+            selectedAnswers.put(questionId, selectedOption);
+        }
+
+        // Move to next question
+        return "redirect:/user/quantitative/test?subtopicId=" + subtopicId + "&index=" + (index + 1);
+    }
+
+
+    // ========== SUBMIT TEST ==========
     @PostMapping("/submit")
     public String submit(
             @RequestParam Long subtopicId,
@@ -87,27 +108,20 @@ public class UserTestController {
             }
         }
 
-        // 🟢 NEW — Calculate Time Taken
+        // 🟢 Time Taken
         long endTime = System.currentTimeMillis();
-        long timeTaken = (endTime - startTime) / 1000; // seconds
+        long timeTaken = (endTime - startTime) / 1000;
 
+        // 🟢 Accuracy
+        double accuracy = (score * 100.0) / questions.size();
+
+        // Send to review.jsp
         model.addAttribute("score", score);
         model.addAttribute("total", questions.size());
         model.addAttribute("selected", selectedAnswers);
-
-        // 🟢 NEW — Pass time taken to review page
         model.addAttribute("timeTaken", timeTaken);
+        model.addAttribute("accuracy", accuracy);
 
         return "user/review";
     }
-
-
-    // ---------- SAVE SELECTED OPTION ----------
-    @PostMapping("/save")
-    @ResponseBody
-    public void saveAnswer(@RequestParam Long questionId,
-                           @RequestParam Long optionId) {
-        selectedAnswers.put(questionId, optionId);
-    }
-
 }
