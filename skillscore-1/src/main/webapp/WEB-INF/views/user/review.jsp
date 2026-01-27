@@ -99,12 +99,10 @@
 
 <div class="container">
 
-    <!-- SCORE SECTION -->
     <div class="score-box">
         Score: ${score} / ${totalQuestions}
     </div>
 
-    <!-- QUESTION WISE REVIEW -->
     <c:forEach var="q" items="${reviewList}" varStatus="loop">
 
         <div class="question-block">
@@ -113,8 +111,8 @@
                 Q${loop.index + 1}. ${q.questionText}
             </div>
 
-            <!-- USER ANSWER -->
-            <div class="opt ${q.isCorrect ? 'correct' : (q.selectedOption != null ? 'wrong' : '')}">
+            <!-- FIXED HERE: use q.correct instead of q.isCorrect -->
+            <div class="opt ${q.correct ? 'correct' : (q.selectedOption != null ? 'wrong' : '')}">
                 <span class="answer-label">Your Answer:</span>
                 <c:choose>
                     <c:when test="${q.selectedOption != null}">
@@ -126,7 +124,6 @@
                 </c:choose>
             </div>
 
-            <!-- CORRECT ANSWER -->
             <div class="opt correct">
                 <span class="answer-label">Correct Answer:</span>
                 ${q.correctOptionText}
@@ -135,7 +132,6 @@
         </div>
     </c:forEach>
 
-    <!-- BACK BUTTON -->
     <form action="/quantitative">
         <button class="back-btn">Back to Quantitative</button>
     </form>
