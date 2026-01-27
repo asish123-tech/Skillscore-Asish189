@@ -1,242 +1,146 @@
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
+<%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Review Summary</title>
-
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Test Review - SkillScore</title>
 
     <style>
         body {
-            font-family: 'Poppins', sans-serif;
-            background: #f4f6fb;
+            background: #e8f3ff;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
         }
 
-        .container {
-            width: 60%;
-            margin: 40px auto;
-            background: #fff;
-            padding: 40px;
-            border-radius: 14px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-        }
-
-        h2 {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .circle-wrapper {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-        }
-
-        /* Circular progress */
-        .progress {
-            width: 160px;
-            height: 160px;
-            background: conic-gradient(#4CAF50 calc(var(--p) * 1%), #ddd 0%);
-            border-radius: 50%;
+        .navbar {
+            height: 64px;
+            background: #0f172a;
+            color: white;
             display: flex;
             align-items: center;
-            justify-content: center;
-            position: relative;
+            padding: 0 30px;
+            font-size: 20px;
+            font-weight: bold;
         }
 
-        .progress-value {
-            font-size: 32px;
-            font-weight: 600;
-            position: absolute;
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
         }
-
-        /* Score badge */
-        .badge {
-            text-align: center;
-            margin-top: 20px;
+        
+        .score-box {
+            background: #eef6ff;
+            padding: 20px;
+            border-radius: 12px;
             font-size: 22px;
-            font-weight: 600;
+            margin-bottom: 25px;
+            font-weight: bold;
         }
 
-        .gold { color: #DAA520; }
-        .silver { color: #9E9E9E; }
-        .bronze { color: #CD7F32; }
-        .fail { color: #E53935; }
+        .question-block {
+            margin-bottom: 35px;
+            padding: 20px;
+            background: #f8fbff;
+            border-radius: 15px;
+            border: 1px solid #d7e6ff;
+        }
 
-        /* Time card */
-        .time-card {
-            margin: 25px auto;
-            width: 50%;
-            background: #eef3ff;
-            border-left: 5px solid #3f51b5;
-            padding: 18px;
-            border-radius: 8px;
+        .question-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .opt {
+            margin: 6px 0;
             font-size: 18px;
-            text-align: center;
+            padding: 8px;
+            border-radius: 10px;
         }
 
-        /* Results Table */
-        table {
-            width: 100%;
-            margin-top: 40px;
-            border-collapse: collapse;
+        .correct {
+            background: #d3ffd9;
+            border-left: 6px solid #18b436;
+            font-weight: bold;
         }
 
-        th, td {
-            padding: 14px;
-            border-bottom: 1px solid #ddd;
+        .wrong {
+            background: #ffe1e1;
+            border-left: 6px solid #ff3b3b;
+            font-weight: bold;
         }
 
-        th {
-            background: #3f51b5;
-            color: #fff;
-            text-align: left;
+        .answer-label {
+            font-weight: bold;
         }
 
-        .tick { color: green; font-size: 22px; }
-        .cross { color: red; font-size: 22px; }
-
-        /* Confetti */
-        #confetti {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
+        .back-btn {
+            padding: 12px 22px;
+            background: #2e6bff;
+            border: none;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
         }
     </style>
 </head>
-
 <body>
 
-<canvas id="confetti"></canvas>
+<div class="navbar">SkillScore – Test Review</div>
 
 <div class="container">
 
-    <h2>Test Review</h2>
+    <!-- SCORE SECTION -->
+    <div class="score-box">
+        Score: ${score} / ${totalQuestions}
+    </div>
 
-    <%
-        int score = (int) request.getAttribute("score");
-        long timeTaken = (long) request.getAttribute("timeTaken"); // milliseconds
-        Map<Long,String> answers = (Map<Long,String>) request.getAttribute("answers");
+    <!-- QUESTION WISE REVIEW -->
+    <c:forEach var="q" items="${reviewList}" varStatus="loop">
 
-        int total = answers.size();
-        double percent = ((double) score / total) * 100;
+        <div class="question-block">
 
-        long seconds = timeTaken / 1000;
-        long minutes = seconds / 60;
-        seconds %= 60;
+            <div class="question-text">
+                Q${loop.index + 1}. ${q.questionText}
+            </div>
 
-        String rank = "";
-        String badgeClass = "";
+            <!-- USER ANSWER -->
+            <div class="opt ${q.isCorrect ? 'correct' : (q.selectedOption != null ? 'wrong' : '')}">
+                <span class="answer-label">Your Answer:</span>
+                <c:choose>
+                    <c:when test="${q.selectedOption != null}">
+                        ${q.selectedOptionText}
+                    </c:when>
+                    <c:otherwise>
+                        <i>Not Answered</i>
+                    </c:otherwise>
+                </c:choose>
+            </div>
 
-        if (percent >= 90) { rank = "Gold Performer 🥇"; badgeClass = "gold"; }
-        else if (percent >= 70) { rank = "Silver Performer 🥈"; badgeClass = "silver"; }
-        else if (percent >= 50) { rank = "Bronze Performer 🥉"; badgeClass = "bronze"; }
-        else { rank = "Needs Improvement 🔴"; badgeClass = "fail"; }
-    %>
+            <!-- CORRECT ANSWER -->
+            <div class="opt correct">
+                <span class="answer-label">Correct Answer:</span>
+                ${q.correctOptionText}
+            </div>
 
-    <!-- Circular Graph -->
-    <div class="circle-wrapper">
-        <div class="progress" style="--p:<%= percent %>;">
-            <div class="progress-value" id="scoreCounter">0%</div>
         </div>
-    </div>
+    </c:forEach>
 
-    <!-- Rank Badge -->
-    <div class="badge <%= badgeClass %>">
-        <%= rank %>
-    </div>
-
-    <!-- Time Taken -->
-    <div class="time-card">
-        ⏱ Time Taken: <b><%= minutes %> min <%= seconds %> sec</b>
-    </div>
-
-    <!-- Table -->
-    <table>
-        <tr>
-            <th>Q. No</th>
-            <th>Your Answer</th>
-            <th>Status</th>
-        </tr>
-
-        <%
-            int i = 1;
-            for (Map.Entry<Long,String> e : answers.entrySet()) {
-                String userAns = e.getValue();
-        %>
-            <tr>
-                <td><%= i++ %></td>
-                <td><%= userAns %></td>
-                <td>
-                    <% if (userAns != null) { %>
-                        ✔ <span class="tick"></span>
-                    <% } else { %>
-                        ✘ <span class="cross"></span>
-                    <% } %>
-                </td>
-            </tr>
-        <% } %>
-    </table>
+    <!-- BACK BUTTON -->
+    <form action="/quantitative">
+        <button class="back-btn">Back to Quantitative</button>
+    </form>
 
 </div>
-
-
-<script>
-    /* Animated score counter */
-    let counter = document.getElementById("scoreCounter");
-    let target = <%= (int) percent %>;
-    let x = 0;
-
-    let interval = setInterval(() => {
-        counter.innerHTML = x + "%";
-        x++;
-        if (x > target) clearInterval(interval);
-    }, 20);
-
-    /* Confetti effect for > 80% */
-    if (target >= 80) {
-        startConfetti();
-    }
-
-    /* Simple Confetti Canvas */
-    function startConfetti() {
-        const canvas = document.getElementById('confetti');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const pieces = [];
-        for (let i = 0; i < 150; i++) {
-            pieces.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height - canvas.height,
-                size: 8,
-                speed: Math.random() * 3 + 2
-            });
-        }
-
-        function draw() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            pieces.forEach(p => {
-                ctx.fillStyle = "hsl(" + Math.random()*360 + ",100%,50%)";
-                ctx.fillRect(p.x, p.y += p.speed, p.size, p.size);
-                if (p.y > canvas.height) p.y = -20;
-            });
-            requestAnimationFrame(draw);
-        }
-        draw();
-    }
-</script>
 
 </body>
 </html>
