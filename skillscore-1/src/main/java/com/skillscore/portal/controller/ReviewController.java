@@ -1,66 +1,110 @@
 package com.skillscore.portal.controller;
 
-
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.skillscore.portal.entity.Option;
+import com.skillscore.portal.entity.Question;
 import com.skillscore.portal.model.ReviewModel;
+import com.skillscore.portal.repository.QuestionRepository;
 
 import jakarta.servlet.http.HttpSession;
 
 @Controller
+@RequestMapping("/user/quantitative")
 public class ReviewController {
 
-    @GetMapping("/test/review")
-    public String showReview(Model model, HttpSession session) {
+    @Autowired
+    private QuestionRepository questionRepository;
 
-        // Get data from session (set during test submit)
-        List<ReviewModel> reviewList =
-                (List<ReviewModel>) session.getAttribute("reviewList");
+    @PostMapping("/submit")
+    public String submitTest(HttpSession session, Model model) {
 
-        Integer score = (Integer) session.getAttribute("score");
-        Integer totalQuestions = (Integer) session.getAttribute("totalQuestions");
-        Integer timeTaken = (Integer) session.getAttribute("timeTaken"); // seconds
+        // ✅ answers saved during test
+        Map<Long, Long> savedAnswers =
+                (Map<Long, Long>) session.getAttribute("savedAnswers");
 
-        if (reviewList == null) {
+        if (savedAnswers == null || savedAnswers.isEmpty()) {
             return "redirect:/quantitative";
         }
 
-        // -------- ACCURACY ----------
-        int accuracy = (int) ((score * 100.0) / totalQuestions);
+        List<ReviewModel> reviewList = new ArrayList<>();
 
-        // -------- BADGE LOGIC ----------
+        int score = 0;
+
+        for (Map.Entry<Long, Long> entry : savedAnswers.entrySet()) {
+
+            Long questionId = entry.getKey();
+            Long selectedOptionId = entry.getValue();
+
+            Question question = questionRepository.findById(questionId).orElse(null);
+            if (question == null) continue;
+
+            ReviewModel rm = new ReviewModel();
+            rm.setQuestionText(question.getQuestionText());
+
+            String correctText = "";
+            String selectedText = "";
+            boolean isCorrect = false;
+
+            for (Option opt : question.getOptions()) {
+
+                if (opt.isCorrect()) {
+                    correctText = opt.getOptionText();
+                }
+
+                if (opt.getId().equals(selectedOptionId)) {
+                    selectedText = opt.getOptionText();
+                    if (opt.isCorrect()) {
+                        isCorrect = true;
+                        score++;
+                    }
+                }
+            }
+
+            rm.setSelectedOption(selectedOptionId);
+            rm.setSelectedOptionText(selectedText);
+            rm.setCorrectOptionText(correctText);
+            rm.setCorrect(isCorrect);
+
+            reviewList.add(rm);
+        }
+
+        int totalQuestions = reviewList.size();
+        int accuracy = (score * 100) / totalQuestions;
+
+        // 🎖 Badge logic
         String badge;
         String badgeIcon;
 
-        if (accuracy >= 90) {
-            badge = "Master";
+        if (accuracy >= 80) {
+            badge = "Gold Performer";
             badgeIcon = "🏆";
-        } else if (accuracy >= 80) {
-            badge = "Expert";
-            badgeIcon = "🥇";
-        } else if (accuracy >= 65) {
-            badge = "Intermediate";
-            badgeIcon = "🥈";
         } else if (accuracy >= 50) {
-            badge = "Beginner";
-            badgeIcon = "🥉";
+            badge = "Silver Achiever";
+            badgeIcon = "🥈";
         } else {
             badge = "Keep Practicing";
-            badgeIcon = "💪";
+            badgeIcon = "🔥";
         }
 
-        // -------- MODEL ----------
+        // 📦 Send to JSP
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("score", score);
         model.addAttribute("totalQuestions", totalQuestions);
         model.addAttribute("accuracy", accuracy);
-        model.addAttribute("timeTaken", timeTaken);
         model.addAttribute("badge", badge);
         model.addAttribute("badgeIcon", badgeIcon);
+
+        // 🧹 cleanup
+        session.removeAttribute("savedAnswers");
 
         return "review";
     }

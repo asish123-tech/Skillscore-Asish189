@@ -12,7 +12,6 @@
             background: #c9eaff;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
         }
 
         .navbar {
@@ -25,15 +24,9 @@
             padding: 0 32px;
         }
 
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
         .container {
             max-width: 900px;
-            margin: 120px auto 40px auto;
+            margin: 120px auto;
             background: white;
             border-radius: 20px;
             padding: 40px;
@@ -42,58 +35,49 @@
 
         .option-box {
             padding: 15px;
-            margin: 0 10px 10px 0;
+            margin: 10px 10px 0 0;
             border: 2px solid #dfe7f1;
             border-radius: 12px;
-            cursor: pointer;
             display: inline-block;
-        }
-
-        .option-box:hover {
-            background: #eef5ff;
+            cursor: pointer;
         }
 
         .btn {
             padding: 12px 24px;
-            margin: 10px;
             border: none;
             background: #2e6bff;
             color: white;
             border-radius: 10px;
             cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
         }
 
-        .btn:disabled {
+        .btn.disabled {
             background: #aab8d6;
-            cursor: not-allowed;
-        }
-
-        .header {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 30px;
+            pointer-events: none;
         }
 
         .question-text {
             font-size: 20px;
             font-weight: bold;
+            margin-bottom: 20px;
         }
     </style>
-
 </head>
+
 <body>
 
 <header class="navbar">
     <div>SkillScore</div>
-    <a href="/quantitative">← Back to Quantitative</a>
 </header>
 
 <div class="container">
 
-    <div class="header">${subtopicName}</div>
+    <h2>${subtopicName}</h2>
 
-    <!-- MAIN FORM FOR SAVE-ANSWER -->
-    <form id="saveForm" method="post" action="/user/quantitative/save-answer">
+    <!-- SAVE ANSWER FORM -->
+    <form method="post" action="/user/quantitative/save-answer">
 
         <input type="hidden" name="questionId" value="${question.id}">
         <input type="hidden" name="subtopicId" value="${subtopicId}">
@@ -102,8 +86,6 @@
         <div class="question-text">
             Q${currentIndex + 1}. ${question.questionText}
         </div>
-
-        <br>
 
         <!-- OPTIONS -->
         <c:forEach var="opt" items="${question.options}">
@@ -118,27 +100,31 @@
 
         <br><br>
 
-        <!-- NAVIGATION -->
-        <div style="display:flex; justify-content: space-between;">
+        <!-- CONTROLS -->
+        <div style="display:flex; justify-content: space-between; align-items:center;">
 
-            <!-- PREVIOUS BUTTON -->
-            <form method="get" action="/user/quantitative/test">
-                <input type="hidden" name="subtopicId" value="${subtopicId}">
-                <input type="hidden" name="index" value="${currentIndex - 1}">
-                <button class="btn" ${currentIndex == 0 ? "disabled" : ""}>Previous</button>
-            </form>
+            <!-- PREVIOUS -->
+            <a class="btn ${currentIndex == 0 ? 'disabled' : ''}"
+               href="/user/quantitative/test?subtopicId=${subtopicId}&index=${currentIndex - 1}">
+                Previous
+            </a>
 
-            <!-- SAVE & NEXT BUTTON -->
+            <!-- SAVE & NEXT -->
             <button class="btn" type="submit">Save & Next</button>
 
-            <!-- SUBMIT BUTTON -->
-            <form method="post" action="/user/quantitative/submit">
-                <input type="hidden" name="subtopicId" value="${subtopicId}">
-                <button class="btn" type="submit">Submit Test</button>
-            </form>
-
+            <!-- SUBMIT TEST -->
+            <a class="btn"
+               href="#"
+               onclick="document.getElementById('submitForm').submit();">
+                Submit Test
+            </a>
         </div>
 
+    </form>
+
+    <!-- SUBMIT FORM (SEPARATE) -->
+    <form id="submitForm" method="post" action="/user/quantitative/submit">
+        <input type="hidden" name="subtopicId" value="${subtopicId}">
     </form>
 
 </div>

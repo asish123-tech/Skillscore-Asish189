@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -106,11 +107,29 @@
 
 <div class="container">
 
+    <!-- CALCULATIONS -->
+    <c:set var="accuracy" value="${(score * 100) / totalQuestions}" />
+
+    <c:choose>
+        <c:when test="${accuracy >= 80}">
+            <c:set var="badge" value="Gold Performer" />
+            <c:set var="badgeIcon" value="🏆" />
+        </c:when>
+        <c:when test="${accuracy >= 50}">
+            <c:set var="badge" value="Silver Achiever" />
+            <c:set var="badgeIcon" value="🥈" />
+        </c:when>
+        <c:otherwise>
+            <c:set var="badge" value="Keep Practicing" />
+            <c:set var="badgeIcon" value="🔥" />
+        </c:otherwise>
+    </c:choose>
+
     <!-- SUMMARY -->
     <div class="summary">
         <div>Score: ${score} / ${totalQuestions}</div>
         <div>Accuracy: ${accuracy}%</div>
-        <div>Time: ${timeTaken} sec</div>
+        <div>Status: ${badge}</div>
     </div>
 
     <!-- BADGE -->
