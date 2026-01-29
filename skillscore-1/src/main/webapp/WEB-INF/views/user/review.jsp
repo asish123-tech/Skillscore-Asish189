@@ -2,17 +2,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Test Review - SkillScore</title>
+    <title>SkillScore – Test Review</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         body {
             background: #e8f3ff;
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
         }
 
         .navbar {
@@ -28,26 +28,36 @@
 
         .container {
             max-width: 900px;
-            margin: 40px auto;
+            margin: 30px auto;
             background: white;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0px 4px 20px rgba(0,0,0,0.1);
+            border-radius: 18px;
         }
-        
-        .score-box {
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
             background: #eef6ff;
             padding: 20px;
-            border-radius: 12px;
-            font-size: 22px;
+            border-radius: 14px;
             margin-bottom: 25px;
+            font-size: 18px;
             font-weight: bold;
         }
 
-        .question-block {
-            margin-bottom: 35px;
+        .badge-box {
+            text-align: center;
+            background: #fff7e6;
             padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+
+        .question-block {
+            margin-bottom: 30px;
             background: #f8fbff;
+            padding: 20px;
             border-radius: 15px;
             border: 1px solid #d7e6ff;
         }
@@ -59,10 +69,10 @@
         }
 
         .opt {
-            margin: 6px 0;
-            font-size: 18px;
-            padding: 8px;
+            padding: 10px;
             border-radius: 10px;
+            margin-top: 8px;
+            font-size: 17px;
         }
 
         .correct {
@@ -77,45 +87,50 @@
             font-weight: bold;
         }
 
-        .answer-label {
-            font-weight: bold;
-        }
-
-        .back-btn {
+        .btn {
             padding: 12px 22px;
             background: #2e6bff;
-            border: none;
             color: white;
+            border: none;
             border-radius: 10px;
-            cursor: pointer;
             font-size: 16px;
-            margin-top: 20px;
+            cursor: pointer;
+            margin-right: 10px;
         }
     </style>
 </head>
+
 <body>
 
 <div class="navbar">SkillScore – Test Review</div>
 
 <div class="container">
 
-    <div class="score-box">
-        Score: ${score} / ${totalQuestions}
+    <!-- SUMMARY -->
+    <div class="summary">
+        <div>Score: ${score} / ${totalQuestions}</div>
+        <div>Accuracy: ${accuracy}%</div>
+        <div>Time: ${timeTaken} sec</div>
     </div>
 
-    <c:forEach var="q" items="${reviewList}" varStatus="loop">
+    <!-- BADGE -->
+    <div class="badge-box">
+        <h2>${badgeIcon} ${badge}</h2>
+        <p>Badge Earned</p>
+    </div>
 
+    <!-- QUESTIONS -->
+    <c:forEach var="q" items="${reviewList}" varStatus="loop">
         <div class="question-block">
 
             <div class="question-text">
                 Q${loop.index + 1}. ${q.questionText}
             </div>
 
-            <!-- FIXED HERE: use q.correct instead of q.isCorrect -->
-            <div class="opt ${q.correct ? 'correct' : (q.selectedOption != null ? 'wrong' : '')}">
-                <span class="answer-label">Your Answer:</span>
+            <div class="opt ${q.correct ? 'correct' : 'wrong'}">
+                Your Answer:
                 <c:choose>
-                    <c:when test="${q.selectedOption != null}">
+                    <c:when test="${q.selectedOptionText != null}">
                         ${q.selectedOptionText}
                     </c:when>
                     <c:otherwise>
@@ -125,18 +140,30 @@
             </div>
 
             <div class="opt correct">
-                <span class="answer-label">Correct Answer:</span>
-                ${q.correctOptionText}
+                Correct Answer: ${q.correctOptionText}
             </div>
 
         </div>
     </c:forEach>
 
+    <!-- ACTIONS -->
     <form action="/quantitative">
-        <button class="back-btn">Back to Quantitative</button>
+        <button class="btn">Practice Again</button>
+        <button class="btn" formaction="/dashboard">Dashboard</button>
     </form>
 
 </div>
+
+<!-- CONFETTI -->
+<script>
+    if (${accuracy} >= 80) {
+        confetti({
+            particleCount: 250,
+            spread: 100,
+            origin: { y: 0.6 }
+        });
+    }
+</script>
 
 </body>
 </html>
