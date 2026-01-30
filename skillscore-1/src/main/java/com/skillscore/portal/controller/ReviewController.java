@@ -18,7 +18,7 @@ import com.skillscore.portal.repository.QuestionRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/quantitative")
+@RequestMapping("/user/quantitative")
 public class ReviewController {
 
     @Autowired
@@ -27,17 +27,15 @@ public class ReviewController {
     @PostMapping("/submit")
     public String submitTest(HttpSession session, Model model) {
 
-        // ✅ answers saved during test
         @SuppressWarnings("unchecked")
-		Map<Long, Long> savedAnswers =
-                (Map<Long, Long>) session.getAttribute("savedAnswers");
+        Map<Long, Long> savedAnswers =
+                (Map<Long, Long>) session.getAttribute("answers");
 
         if (savedAnswers == null || savedAnswers.isEmpty()) {
-            return "redirect:/quantitative";
+            return "redirect:/user/quantitative";
         }
 
         List<ReviewModel> reviewList = new ArrayList<>();
-
         int score = 0;
 
         for (Map.Entry<Long, Long> entry : savedAnswers.entrySet()) {
@@ -70,7 +68,6 @@ public class ReviewController {
                 }
             }
 
-            rm.setSelectedOption(selectedOptionId);
             rm.setSelectedOptionText(selectedText);
             rm.setCorrectOptionText(correctText);
             rm.setCorrect(isCorrect);
@@ -81,10 +78,7 @@ public class ReviewController {
         int totalQuestions = reviewList.size();
         int accuracy = (score * 100) / totalQuestions;
 
-        // 🎖 Badge logic
-        String badge;
-        String badgeIcon;
-
+        String badge, badgeIcon;
         if (accuracy >= 80) {
             badge = "Gold Performer";
             badgeIcon = "🏆";
@@ -96,7 +90,6 @@ public class ReviewController {
             badgeIcon = "🔥";
         }
 
-        // 📦 Send to JSP
         model.addAttribute("reviewList", reviewList);
         model.addAttribute("score", score);
         model.addAttribute("totalQuestions", totalQuestions);
@@ -104,9 +97,8 @@ public class ReviewController {
         model.addAttribute("badge", badge);
         model.addAttribute("badgeIcon", badgeIcon);
 
-        // 🧹 cleanup
-        session.removeAttribute("savedAnswers");
+        session.removeAttribute("answers");
 
-        return "/user/review";
+        return "user/review"; // ✅ CORRECT
     }
 }

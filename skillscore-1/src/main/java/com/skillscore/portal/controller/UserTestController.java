@@ -9,8 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import com.skillscore.portal.entity.Option;
 import com.skillscore.portal.entity.Question;
 import com.skillscore.portal.entity.Subtopic;
+import com.skillscore.portal.model.ReviewModel;
 import com.skillscore.portal.repository.QuestionRepository;
 import com.skillscore.portal.repository.SubtopicRepository;
 
@@ -35,11 +37,9 @@ public class UserTestController {
         Subtopic subtopic = subtopicRepository.findById(subtopicId).orElse(null);
         List<Question> questions = questionRepository.findBySubtopic(subtopic);
 
-        // start timer once
         if (index == 0 && session.getAttribute("startTime") == null) {
             session.setAttribute("startTime", System.currentTimeMillis());
             session.setAttribute("answers", new HashMap<Long, Long>());
-            session.setAttribute("subtopicId", subtopicId);
         }
 
         if (index < 0) index = 0;
@@ -76,6 +76,6 @@ public class UserTestController {
                 subtopicId + "&index=" + (index + 1);
     }
 
-    // ---------- SUBMIT (REDIRECT ONLY) ----------
-  
+    // ---------- SUBMIT TEST → REVIEW PAGE ----------
+   
 }
