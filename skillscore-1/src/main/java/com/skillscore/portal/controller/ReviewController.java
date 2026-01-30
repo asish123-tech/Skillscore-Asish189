@@ -18,7 +18,7 @@ import com.skillscore.portal.repository.QuestionRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/user/quantitative")
+@RequestMapping("/quantitative")
 public class ReviewController {
 
     @Autowired
@@ -28,7 +28,8 @@ public class ReviewController {
     public String submitTest(HttpSession session, Model model) {
 
         // ✅ answers saved during test
-        Map<Long, Long> savedAnswers =
+        @SuppressWarnings("unchecked")
+		Map<Long, Long> savedAnswers =
                 (Map<Long, Long>) session.getAttribute("savedAnswers");
 
         if (savedAnswers == null || savedAnswers.isEmpty()) {
@@ -106,6 +107,6 @@ public class ReviewController {
         // 🧹 cleanup
         session.removeAttribute("savedAnswers");
 
-        return "review";
+        return "/user/review";
     }
 }
