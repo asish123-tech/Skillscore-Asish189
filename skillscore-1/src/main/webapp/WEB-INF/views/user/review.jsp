@@ -166,10 +166,10 @@
     </c:forEach>
 
     <!-- ACTIONS -->
-    <form action="/quantitative">
-        <button class="btn">Practice Again</button>
-        <button class="btn" formaction="/dashboard-student">Dashboard</button>
-    </form>
+    
+        <button class="btn" action="quantitative">Practice Again</button>
+        <button class="btn" action="dashboard-student">Dashboard</button>
+    
 
 </div>
 

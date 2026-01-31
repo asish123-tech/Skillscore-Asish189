@@ -123,7 +123,7 @@
     </form>
 
     <!-- SUBMIT FORM (SEPARATE) -->
-    <form id="submitForm" method="post" action="/user/quantitative/submit">
+    <form id="submitForm" method="post" action="/quantitative/submit">
         <input type="hidden" name="subtopicId" value="${subtopicId}">
     </form>
 

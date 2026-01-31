@@ -18,7 +18,7 @@ import com.skillscore.portal.repository.QuestionRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/user/quantitative")
+@RequestMapping("/quantitative")
 public class ReviewController {
 
     @Autowired
