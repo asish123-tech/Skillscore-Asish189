@@ -168,7 +168,7 @@
     <!-- ACTIONS -->
     <form action="/quantitative">
         <button class="btn">Practice Again</button>
-        <button class="btn" formaction="/dashboard">Dashboard</button>
+        <button class="btn" formaction="/dashboard-student">Dashboard</button>
     </form>
 
 </div>

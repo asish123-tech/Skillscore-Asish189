@@ -67,10 +67,17 @@ public class UserTestController {
             @RequestParam int index,
             HttpSession session) {
 
-        Map<Long, Long> answers =
-                (Map<Long, Long>) session.getAttribute("answers");
+    	@SuppressWarnings("unchecked")
+    	Map<Long, Long> answers =
+    	        (Map<Long, Long>) session.getAttribute("answers");
 
-        answers.put(questionId, selectedOption);
+    	if (answers == null) {
+    	    answers = new HashMap<>();
+    	    session.setAttribute("answers", answers);
+    	}
+
+    	answers.put(questionId, selectedOption);
+
 
         return "redirect:/user/quantitative/test?subtopicId=" +
                 subtopicId + "&index=" + (index + 1);
