@@ -168,7 +168,8 @@
     <!-- ACTIONS -->
     
         <button class="btn" action="quantitative">Practice Again</button>
-        <button class="btn" action="dashboard-student">Dashboard</button>
+		<a href="dashboard-student" class="btn">Dashboard</a>
+
     
 
 </div>
