@@ -17,7 +17,7 @@ import com.skillscore.portal.repository.QuestionRepository;
 import com.skillscore.portal.repository.SubtopicRepository;
 
 @Controller
-@RequestMapping("/user/quantitative")
+@RequestMapping("/user")
 public class UserTestController {
 
     @Autowired

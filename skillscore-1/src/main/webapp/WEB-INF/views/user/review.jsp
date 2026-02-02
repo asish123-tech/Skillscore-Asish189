@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html>
@@ -92,11 +91,11 @@
             padding: 12px 22px;
             background: #2e6bff;
             color: white;
-            border: none;
             border-radius: 10px;
             font-size: 16px;
-            cursor: pointer;
+            text-decoration: none;
             margin-right: 10px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -106,24 +105,6 @@
 <div class="navbar">SkillScore – Test Review</div>
 
 <div class="container">
-
-    <!-- CALCULATIONS -->
-    <c:set var="accuracy" value="${(score * 100) / totalQuestions}" />
-
-    <c:choose>
-        <c:when test="${accuracy >= 80}">
-            <c:set var="badge" value="Gold Performer" />
-            <c:set var="badgeIcon" value="🏆" />
-        </c:when>
-        <c:when test="${accuracy >= 50}">
-            <c:set var="badge" value="Silver Achiever" />
-            <c:set var="badgeIcon" value="🥈" />
-        </c:when>
-        <c:otherwise>
-            <c:set var="badge" value="Keep Practicing" />
-            <c:set var="badgeIcon" value="🔥" />
-        </c:otherwise>
-    </c:choose>
 
     <!-- SUMMARY -->
     <div class="summary">
@@ -166,24 +147,23 @@
     </c:forEach>
 
     <!-- ACTIONS -->
-    
-        <button class="btn" action="quantitative">Practice Again</button>
-		<a href="dashboard-student" class="btn">Dashboard</a>
-
-    
+    <div style="margin-top: 20px;">
+        <a href="/user/test" class="btn">Practice Again</a>
+        <a href="dashboard-student" class="btn">Dashboard</a>
+    </div>
 
 </div>
 
 <!-- CONFETTI -->
+<c:if test="${accuracy >= 80}">
 <script>
-    if (${accuracy} >= 80) {
-        confetti({
-            particleCount: 250,
-            spread: 100,
-            origin: { y: 0.6 }
-        });
-    }
+    confetti({
+        particleCount: 250,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
 </script>
+</c:if>
 
 </body>
 </html>
