@@ -87,9 +87,11 @@
             overflow: hidden;
         }
 
+        /* ✅ ONLY CHANGE: smooth animation */
         .progress {
             height: 100%;
             background: #2563eb;
+            transition: width 0.6s ease;
         }
 
         button {
@@ -122,70 +124,70 @@
 
     <div class="topic-grid">
 
+        <!-- Percentages -->
         <div class="topic-card">
             <h3>Percentages</h3>
             <p>Basics, increase & decrease</p>
 
             <div class="progress-bar">
-                <div class="progress" style="width: 0%"></div>
+                <div class="progress" style="width:${progress[21]}%"></div>
             </div>
 
             <button onclick="startPercentages()">Start</button>
             <script>
                 function startPercentages() {
-					window.location.href = "/user/quantitative/test?subtopicId=21";
-
+                    window.location.href = "/user/test?subtopicId=21";
                 }
             </script>
         </div>
 
+        <!-- Profit & Loss -->
         <div class="topic-card">
             <h3>Profit & Loss</h3>
             <p>CP, SP, discounts</p>
 
             <div class="progress-bar">
-                <div class="progress" style="width: 0%"></div>
+                <div class="progress" style="width:${progress[22]}%"></div>
             </div>
 
             <button onclick="startProfitLoss()">Start</button>
             <script>
                 function startProfitLoss() {
-					window.location.href = "/user/quantitative/test?subtopicId=22";
-
+                    window.location.href = "/user/test?subtopicId=22";
                 }
             </script>
         </div>
 
+        <!-- Time & Work -->
         <div class="topic-card">
             <h3>Time & Work</h3>
             <p>Pipes, work efficiency</p>
 
             <div class="progress-bar">
-                <div class="progress" style="width: 0%"></div>
+                <div class="progress" style="width:${progress[23]}%"></div>
             </div>
 
             <button onclick="startTimeWork()">Start</button>
             <script>
                 function startTimeWork() {
-					window.location.href = "/user/quantitative/test?subtopicId=23";
-
+                    window.location.href = "/user/test?subtopicId=23";
                 }
             </script>
         </div>
 
+        <!-- Time Speed Distance -->
         <div class="topic-card">
             <h3>Time, Speed & Distance</h3>
             <p>Trains, boats, relative speed</p>
 
             <div class="progress-bar">
-                <div class="progress" style="width: 0%"></div>
+                <div class="progress" style="width:${progress[24]}%"></div>
             </div>
 
             <button onclick="startTSD()">Start</button>
             <script>
                 function startTSD() {
-					window.location.href = "/user/quantitative/test?subtopicId=24";
-
+                    window.location.href = "/user/test?subtopicId=24";
                 }
             </script>
         </div>
